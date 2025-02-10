@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+
+  backend:
+    container_name: backend-service
+    # image : iomc_backend:latest
+    build:
+      context: ./Back_end
+      dockerfile: Dockerfile
+    restart: always
+    env_file: .env
+    ports:
+      - "3050:3050" # Expose port 3000 for the Node.js backend
+    # depends_on:
+    #   - wait-for-mysql
+
+
+  camera_lkb_in:
+    container_name: camera_lkb_in
+    build:
+      context: ./lkb_in
+      dockerfile: Dockerfile
+    environment:
+      - DISPLAY=${DISPLAY}
+      - AREA_ZONE=LKB-IN
+      - CONFIG_FILE_NAME=LKB-IN.json
+      - BACK_END_PATH=http://backend:3050/Car_count
+      # - QT_QPA_PLATFORM_PLUGIN_PATH=/usr/lib/x86_64-linux-gnu/qt5/plugins/platforms
+      # - QT_QPA_PLATFORM=offscreen
+      - RTSP_PATH=rtsp://admin:Iomc%402024@10.170.32.18/LiveMedia/ch1/Media2
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+    restart: always
+
+  # wait-for-mysql:
+  #   image: alpine:latest
+  #   entrypoint: sh -c "apk add --no-cache mysql-client && until mysqladmin ping -h host.docker.internal --silent; do sleep 1; done"
+
+# volumes:
+#   python-libs:
+#   config-files:
+
+ 

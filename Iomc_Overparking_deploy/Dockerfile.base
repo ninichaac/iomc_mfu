@@ -1,0 +1,28 @@
+FROM python:3.10.12-slim
+
+# Install necessary libraries for OpenCV
+RUN apt-get update && apt-get install -y \
+    libgl1-mesa-glx \
+    libxcb-xinerama0 \
+    libx11-dev \
+    libxext-dev \
+    libxrender-dev \
+    libglib2.0-0 \
+    qt5-qmake \
+    qtbase5-dev \
+    qtbase5-dev-tools \
+    libx11-6 \
+    libxext6 \
+    libxcb1 && \
+    rm -rf /var/lib/apt/lists/*
+
+# Set working directory
+WORKDIR /app
+
+# Copy and install dependencies
+COPY requirements.txt .
+RUN pip install --upgrade pip
+COPY ./lib /app/wheels/
+RUN pip install --no-index --find-links=/app/wheels -r requirements.txt
+
+# Save as base image
